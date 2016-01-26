@@ -1,5 +1,5 @@
-# Created by `pip install -t pip_modules`
-pip_modules
+# Created by virtualenv. Used to control packages and versions
+virt_env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
