@@ -8,7 +8,10 @@ git clone ssh://git@github.com/beeryardtech/dropbox-diff.git
 cd dropbox-diff
 
 # Start virtualenv!
-source virt_env/bin/activate
+source virt.sh
+
+## Get packages
+pip install -r requirements.txt
 
 ## Do the coding!
 
@@ -21,13 +24,19 @@ pyb
 # Install and run virtualenv,
 # to store local modules
 pip install virtualenv
-virtualenv virt_env
-source virt_env/bin/activate
+
+# Save the virtual env off in home directory.
+# virtualenv does not play nice with dropbox
+virtualenv ~/.virtualenv/dbdiff
+source virt.sh
 
 # Use pybuilder to setup build scripts and scaffolding
 # Use default options. Include all the plugins.
-pip install pybuilder
+pip install dropbox configparser argparser pybuilder
 pyb --start-project
+
+# XXX - if available run the requirements.txt to get all the packages
+pip install -r requirements.txt
 
 ## Finally, publish the project
 pyb install_dependencies publish

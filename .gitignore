@@ -1,6 +1,9 @@
 # Created by virtualenv. Used to control packages and versions
 virt_env
 
+# Ropeproject created by VIM's pymode
+.ropeproject
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
