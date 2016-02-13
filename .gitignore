@@ -1,6 +1,9 @@
 # Created by virtualenv. Used to control packages and versions
 virt_env
 
+# Don't version control the dbdiff file
+dbdiff.ini
+
 # Ropeproject created by VIM's pymode
 .ropeproject
 
