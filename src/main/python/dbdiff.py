@@ -57,15 +57,15 @@ def main(args):
         logging.basicConfig(level = logging.INFO)
 
     # Handle warnings from urllib3
-    import urllib3
-    urllib3.disable_warnings()
+    # import urllib3
+    # urllib3.disable_warnings()
     logging.captureWarnings(True)
 
     # Debug mode? (turn this on first, in case we want to debug below)
-    if config.get("debug"):
+    if config.get("verbose"):
         logging.getLogger().setLevel(logging.DEBUG)
 
-    # now, let's see which subcommand was given and pass everything along to it
+    # Now, let's see which subcommand was given and pass everything along to it
     if opts.subcommand:
         cli.subcommands[opts.subcommand].run(config)
     else:

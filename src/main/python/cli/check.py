@@ -27,6 +27,7 @@ __log__  = logging.getLogger(__name__)
 
 def add_args(parser):
     """Add my arguments to the given argparse parser."""
+    pass
 
 
 def run(config):
@@ -35,8 +36,11 @@ def run(config):
 
     Attempts to:
         - Test authentication by creating a connection.
-        - Get a list of files
-        - Gets the revision list of first file
+        - List the root dir
+        - Puts a tmp file on dropbox
+        - Gets that tmp file from dropbox
+        - Checks that there is revisions available
+        - Deletes that file
     """
     client, config = auth.build_client(config)
 
@@ -76,7 +80,7 @@ def run(config):
 
 def check_root(client, config):
     """
-    Checks if client can acess the root directory and that it is non-empty
+    Checks if client can access the root directory and that it is non-empty
     """
     result = True
 
@@ -108,6 +112,10 @@ def check_put(client, config, db_filepath, tmpfile):
 
 
 def check_get(client, config, db_filepath):
+    """
+    Checks if client can get the file at `db_filepath` and
+    that file is not empty.
+    """
     result = True
 
     try:
@@ -122,6 +130,9 @@ def check_get(client, config, db_filepath):
 
 
 def check_rev(client, config, db_filepath):
+    """
+    Checks that the file at `db_filepath` has at least one "revision".
+    """
     result = True
     try:
         revs = client.revisions(db_filepath)
@@ -134,6 +145,10 @@ def check_rev(client, config, db_filepath):
 
 
 def check_delete(client, config, db_filepath):
+    """
+    Checks that the file at `db_filepath` is deleted. That is the metadata says
+    it has a size of 0 and has the `is_deleted` flag set.
+    """
     result = True
 
     try:
@@ -146,7 +161,9 @@ def check_delete(client, config, db_filepath):
     return result
 
 def __build_tmp_file():
-    """ Creates the tmp file used for checking put and get operations """
+    """
+    Creates the tmp file used for checking put and get operations
+    """
     tmpfile = open(__random_filename(), "w+")
     tmpfile.write("Temp data: {}".format(tmpfile.name))
     tmpfile.flush()

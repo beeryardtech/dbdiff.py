@@ -29,20 +29,12 @@ def add_args(current_dir, args):
     """ Add arguments to parser. Return new parser """
     parser = argparse.ArgumentParser(prog = args[0], prefix_chars = '-')
 
-    parser.add_argument(
-        "-d",
-        "--debug",
-        action = "store_true",
-        default = None,
-        help = _("add debug information to the output, default  =  False"),
-        required = False,
-    )
-
+    default_config = "{}/dbdiff.ini".format(current_dir)
     parser.add_argument(
         "--config",
-        # This is the only default defined here
-        default = "{}/dbdiff.ini".format(current_dir),
-        help = _("Path to config file."),
+        ## XXX This is the only default defined here
+        default = default_config,
+        help = _("Path to config file.\n Default is {}".format(default_config)),
     )
 
     parser.add_argument(

@@ -2,10 +2,12 @@
 # vim: tabstop=4:shiftwidth=4:expandtab:
 from __future__ import with_statement
 
-import ConfigParser
 import gettext
 import logging
-from os.path import dirname, realpath  # for library path manipulation
+from mockito import mock, verify
+import os
+from os.path import dirname, realpath # for library path manipulation
+import sys
 import unittest
 
 # For translations
@@ -16,21 +18,14 @@ __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
 
-__log__ = logging.getLogger(__name__)
+__log__  = logging.getLogger(__name__)
 
+from libs import pathutils
 
-class TestConfigUtils(unittest.TestCase):
-    def setUp(self):
-        import configutils
-        self.configutils = configutils
-
-
-    def test_merge(self):
-        pass
-
-    def test_load_config(self):
-        self.assertIsInstance(ConfigParser.ConfigParser())
+class PathutilsTest(unittest.TestCase):
+    def test_normpath(self):
+        out = mock()
 
 
 if __name__ == '__main__':
-    unittest.main()
+    pass
