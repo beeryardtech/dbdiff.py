@@ -11,8 +11,8 @@ from dropbox.client import DropboxOAuth2FlowNoRedirect, DropboxClient
 from dropbox import rest as dbrest
 
 # For translations
-i18n = gettext.translation('', '{}/../i18n'.format(dirname(realpath(__file__))), fallback = True)
-_ = i18n.lgettext
+
+
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"

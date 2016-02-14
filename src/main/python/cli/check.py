@@ -12,8 +12,8 @@ import sys
 import tempfile
 
 # For translations
-i18n = gettext.translation('', '{}/../i18n'.format(dirname(realpath(__file__))), fallback = True)
-_ = i18n.lgettext
+
+
 
 sys.path.insert(0, '{}/libs'.format(dirname(realpath(__file__))))
 from libs import auth

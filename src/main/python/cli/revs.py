@@ -24,13 +24,13 @@ def add_args(parser):
     """Add my arguments to the given argparse parser."""
     parser.add_argument(
         "local_file",
-        help = _("Path to file. This will be parsed to see find path relative to Dropbox dir"),
+        help = "Path to file. This will be parsed to see find path relative to Dropbox dir",
     )
 
     parser.add_argument(
         "--format",
         default = "json",
-        help = _("Which formatter function to use")
+        help = "Which formatter function to use"
     )
 
 

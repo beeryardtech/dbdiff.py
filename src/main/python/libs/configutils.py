@@ -11,8 +11,8 @@ from os.path import dirname, realpath  # for library path manipulation
 import sys
 
 # For translations
-i18n = gettext.translation('', '{}/../i18n'.format(dirname(realpath(__file__))), fallback = True)
-_ = i18n.lgettext
+
+
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -34,7 +34,7 @@ def add_args(current_dir, args):
         "--config",
         ## XXX This is the only default defined here
         default = default_config,
-        help = _("Path to config file.\n Default is {}".format(default_config)),
+        help = "Path to config file.\n Default is {}".format(default_config),
     )
 
     parser.add_argument(
@@ -42,7 +42,7 @@ def add_args(current_dir, args):
         "--quiet",
         action = "store_true",
         default = None,
-        help = _("Stop all logging. Only output data."),
+        help = "Stop all logging. Only output data.",
     )
 
     parser.add_argument(
@@ -50,7 +50,7 @@ def add_args(current_dir, args):
         "--verbose",
         action = "store_true",
         default = None,
-        help = _("make the output more verbose, default = False"),
+        help = "make the output more verbose, default = False",
         required = False,
     )
 
