@@ -4,15 +4,9 @@ from __future__ import with_statement
 
 import argparse
 import ConfigParser
-import gettext
 import logging
 import os
-from os.path import dirname, realpath  # for library path manipulation
 import sys
-
-# For translations
-
-
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -32,7 +26,7 @@ def add_args(current_dir, args):
     default_config = "{}/dbdiff.ini".format(current_dir)
     parser.add_argument(
         "--config",
-        ## XXX This is the only default defined here
+        # XXX This is the only default defined here
         default = default_config,
         help = "Path to config file.\n Default is {}".format(default_config),
     )

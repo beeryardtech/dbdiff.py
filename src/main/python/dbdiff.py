@@ -2,22 +2,16 @@
 # vim: tabstop=4:shiftwidth=4:expandtab:
 from __future__ import with_statement
 
-import gettext
 import logging
-from os.path import dirname, realpath  # for library path manipulation
+from os.path import dirname, realpath
 import sys
 import urllib3
 
-# For translations
 current_dir = dirname(realpath(__file__))
-i18n = gettext.translation('', '{}/../i18n'.format(current_dir), fallback = True)
-_ = i18n.lgettext
-
-# Setup sys path and the i18n directory
-sys.path.insert(0, '{}/cli'.format(dirname(realpath(__file__))))
+sys.path.insert(0, '{}/cli'.format(current_dir))
 import cli
 
-sys.path.insert(0, '{}/libs'.format(dirname(realpath(__file__))))
+sys.path.insert(0, '{}/libs'.format(current_dir))
 from libs import configutils
 
 __author__ = "Travis Goldie"
@@ -34,15 +28,15 @@ def main(args):
     # Add the args from any cli subcommands under the parser named after
     # the desired name from the cli module
     subparsers = parser.add_subparsers(
-        title = _("subcommands"),
-        description = _("available subcommands"),
-        dest = _("subcommand")
+        title = "subcommands",
+        description = "available subcommands",
+        dest = "subcommand"
     )
 
     for sc in cli.subcommands:
         subparser = subparsers.add_parser(
             sc,
-            help = _("subcommand for {} operations.").format(sc)
+            help = "subcommand for {} operations.".format(sc)
         )
         cli.subcommands[sc].add_args(subparser)
 
