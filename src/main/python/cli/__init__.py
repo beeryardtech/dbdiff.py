@@ -4,6 +4,7 @@ from __future__ import with_statement
 
 # import the subcommands
 from . import check
+from . import get
 from . import revs
 
 __author__ = "Travis Goldie"
@@ -13,9 +14,9 @@ __copyright__ = "(c) Beeryard Tech 2016"
 # Exposed to Parser. List of subcommands
 subcommands = {
     "check": check,
+    "get": get,
     "revs": revs,
     # "diff": diff,
-    # "get": get,
     # "update": update,
 }
 

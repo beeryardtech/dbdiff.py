@@ -4,15 +4,11 @@ from __future__ import with_statement
 
 from dropbox import rest as dbrest
 from functools import partial
-import gettext
 import logging
 import os
 from os.path import dirname, realpath # for library path manipulation
 import sys
 import tempfile
-
-# For translations
-
 
 
 sys.path.insert(0, '{}/libs'.format(dirname(realpath(__file__))))

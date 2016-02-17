@@ -17,3 +17,4 @@ default_task = "publish"
 def set_properties(project):
     project.set_property('unittest_module_glob', '*_test')
 
+    return

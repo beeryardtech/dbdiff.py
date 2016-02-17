@@ -6,6 +6,7 @@ import gettext
 import logging
 from os.path import dirname, realpath  # for library path manipulation
 import sys
+import urllib3
 
 # For translations
 current_dir = dirname(realpath(__file__))
@@ -57,8 +58,7 @@ def main(args):
         logging.basicConfig(level = logging.INFO)
 
     # Handle warnings from urllib3
-    # import urllib3
-    # urllib3.disable_warnings()
+    urllib3.disable_warnings()
     logging.captureWarnings(True)
 
     # Debug mode? (turn this on first, in case we want to debug below)

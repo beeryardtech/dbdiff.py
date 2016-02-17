@@ -25,11 +25,8 @@ def find_remote_db_path(filepath, db_basepath = None):
         db_basepath = get_db_basepath()
 
     # Return the remote half of the path
-    return normpath(filepath).split[1]
-
-
-def resolve_path(filepath):
-    pass
+    path = abspath(filepath)
+    return path.split(db_basepath)[1]
 
 
 def is_local_db_path(filepath, db_basepath = None):
@@ -40,12 +37,16 @@ def is_local_db_path(filepath, db_basepath = None):
 
 
 def normpath(filepath):
+    """Normalize `filepath`. That is call os.path.norm path, and expand user/vars"""
     return os.path.normpath(
         os.path.expandvars(
             os.path.expanduser(filepath)
         )
     )
 
+def abspath(filepath):
+    """ Get the normalized path of `filepath`"""
+    return normpath(os.path.abspath(filepath))
 
 def get_db_basepath():
     """
