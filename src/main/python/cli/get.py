@@ -3,7 +3,6 @@
 from __future__ import with_statement
 
 import logging
-import os
 import sys
 from libs import auth, pathutils
 
@@ -11,7 +10,8 @@ __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
 
-__log__  = logging.getLogger(__name__)
+__log__ = logging.getLogger(__name__)
+
 
 def add_args(parser):
     """Add my arguments to the given argparse parser."""
@@ -33,7 +33,7 @@ def add_args(parser):
         help = "Which given revision position to use. 0 is the newest revision"
     )
 
-    ## TODO Create a arg for getting by date
+    # TODO Create a arg for getting by date
 
 
 def run(config):

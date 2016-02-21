@@ -72,22 +72,68 @@ def merge_configs(config_path, argopts):
     """
     Loads and merges the configs
     """
-    configopts = load_config(config_path)
+    configopts = load_config_parser(config_path)
     merge_result = merge(configopts, argopts)
 
     return merge_result
 
 
-def load_config(config_path):
-    """ Create config parser from file """
+def load_config_parser(config_path):
+    """
+    Create config parser from the file at `config_path`.
+    """
     config_parser = ConfigParser.ConfigParser()
 
     # Get config file
     if os.path.exists(config_path):
         config_parser.read(config_path)
+    else:
+        __log__.debug("config_path does not exist! {}".format(config_path))
 
     return config_parser
 
+
+def vim_build_config(*sources):
+    """
+    XXX This should only be used with VIM (say plugin)
+
+    Builds the config object using VIM variables. The `sources` are
+    merged in with the created config object.
+    """
+    varsToKeys = {
+        "app_code": "g:dbdiff_config_auth_app_code",
+        "app_key": "g:dbdiff_config_auth_app_key",
+        "app_secret": "g:dbdiff_config_auth_app_secret",
+        "app_token": "g:dbdiff_config_auth_app_token",
+        "quit": "g:dbdiff_config_system_quit",
+    }
+    # Build the config object
+    config = vim_eval_var_keys(varsToKeys)
+
+    # Now merge in any additional `sources` to `config`
+    for source in sources:
+        if isinstance(source, dict):
+            config.update(source)
+        else:
+            __log__.error("Source is not a dict! Type: {} Value: {}".format(type(source), source))
+
+    return config
+
+
+def vim_eval_var_keys(varsToKeys):
+    """
+    Evals each value and returns a dict with the given keys.
+    """
+    import vim
+
+    result = {}
+    for keyVal, varName in varsToKeys.items():
+        try:
+            result[keyVal] = vim.eval(varName)
+        except vim.error as err:
+            __log__.exception("Issue with eval'ing key. Message: {}".format(err.message))
+
+    return result
 
 if __name__ == '__main__':
     main(sys.argv)
