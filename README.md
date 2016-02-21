@@ -4,8 +4,12 @@ Scripts to get revision history for a given file and to diff that file.
 ## Setup
 ### Getting Project
 ```sh
-git clone ssh://git@github.com/beeryardtech/dropbox-diff.git
-cd dropbox-diff
+# For Mac to install pip
+sudo easy_install pip
+
+# Clone the repo
+git clone ssh://git@github.com/beeryardtech/dbdiff.py.git
+cd dbdiff.py
 
 # Start virtualenv!
 source virt.sh
@@ -23,7 +27,7 @@ pyb
 ```sh
 # Install and run virtualenv,
 # to store local modules
-pip install virtualenv
+sudo pip install virtualenv
 
 # Save the virtual env off in home directory.
 # virtualenv does not play nice with dropbox
