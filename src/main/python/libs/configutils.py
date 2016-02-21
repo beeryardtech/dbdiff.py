@@ -7,6 +7,7 @@ import ConfigParser
 import logging
 import os
 import sys
+import urllib3
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -93,6 +94,31 @@ def load_config_parser(config_path):
     return config_parser
 
 
+def setup_logger(config):
+    """
+    Sets up the `logging` config. If `quiet` config is set, logging level
+    is `CRITICAL`, otherwise defaults to `INFO`.
+    """
+    # Disable logging in quit mode. Otherwise enable basic config
+    if config.get("quiet"):
+        logging.basicConfig(level = logging.CRITICAL)
+    else:
+        logging.basicConfig(level = logging.INFO)
+
+    # Debug mode? (turn this on first, in case we want to debug below)
+    if config.get("verbose"):
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    # Handle warnings from urllib3
+    urllib3.disable_warnings()
+    logging.captureWarnings(True)
+
+    return
+
+
+###
+# UTILS FOR VIM PLUGIN
+###
 def vim_build_config(*sources):
     """
     XXX This should only be used with VIM (say plugin)
@@ -105,8 +131,12 @@ def vim_build_config(*sources):
         "app_key": "g:dbdiff_config_auth_app_key",
         "app_secret": "g:dbdiff_config_auth_app_secret",
         "app_token": "g:dbdiff_config_auth_app_token",
+        "debug": "g:dbdiff_config_system_debug",
+        "input_disabled": "g:dbdiff_config_system_input_disabled",
         "quit": "g:dbdiff_config_system_quit",
+        "verbose": "g:dbdiff_config_system_verbose",
     }
+
     # Build the config object
     config = vim_eval_var_keys(varsToKeys)
 
@@ -127,13 +157,25 @@ def vim_eval_var_keys(varsToKeys):
     import vim
 
     result = {}
-    for keyVal, varName in varsToKeys.items():
+    for keyVal, varVal in varsToKeys.items():
         try:
-            result[keyVal] = vim.eval(varName)
+            varValToUse = vim.eval(varVal)
         except vim.error as err:
-            __log__.exception("Issue with eval'ing key. Message: {}".format(err.message))
+            # Could not eval value. So just use it in its raw form
+            varValToUse = varVal
+            __log__.debug(
+                "Issue with eval'ing key. Key: {}, Val: {} Message: {}".format(
+                    keyVal,
+                    varVal,
+                    err.message
+                )
+            )
+
+        # Now set value onto the dict
+        result[keyVal] = varValToUse
 
     return result
+
 
 if __name__ == '__main__':
     main(sys.argv)

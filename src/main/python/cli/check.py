@@ -6,19 +6,15 @@ from dropbox import rest as dbrest
 from functools import partial
 import logging
 import os
-from os.path import dirname, realpath # for library path manipulation
 import sys
-import tempfile
 
-
-sys.path.insert(0, '{}/libs'.format(dirname(realpath(__file__))))
 from libs import auth
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
 
-__log__  = logging.getLogger(__name__)
+__log__ = logging.getLogger(__name__)
 
 
 def add_args(parser):
@@ -48,6 +44,7 @@ def run(config):
 
     # Build each check func as partials
     partial_funcs = [
+        partial(check_virtenv),
         partial(check_root, client, config),
         partial(check_put, client, config, db_filepath, tmpfile),
         partial(check_get, client, config, db_filepath),
@@ -84,7 +81,7 @@ def check_root(client, config):
         root_meta = client.metadata('/')
         result = root_meta["contents"] and len(root_meta["contents"])
 
-    except dbrest.ErrorResponse as err:
+    except dbrest.ErrorResponse:
         result = False
 
     return result
@@ -101,7 +98,7 @@ def check_put(client, config, db_filepath, tmpfile):
         put_response = client.put_file(db_filepath, tmpfile, overwrite = True)
         result = put_response.get("bytes") > 0
 
-    except dbrest.ErrorResponse as err:
+    except dbrest.ErrorResponse:
         result = False
 
     return result
@@ -119,7 +116,7 @@ def check_get(client, config, db_filepath):
             if not get_file.read():
                 result = False
 
-    except dbrest.ErrorResponse as err:
+    except dbrest.ErrorResponse:
         result = False
 
     return result
@@ -134,7 +131,7 @@ def check_rev(client, config, db_filepath):
         revs = client.revisions(db_filepath)
         result = len(revs) > 0
 
-    except dbrest.ErrorResponse as err:
+    except dbrest.ErrorResponse:
         result = False
 
     return result
@@ -151,10 +148,18 @@ def check_delete(client, config, db_filepath):
         del_response = client.file_delete(db_filepath)
         result = del_response.get("bytes") == 0 and del_response.get("is_deleted")
 
-    except dbrest.ErrorResponse as err:
+    except dbrest.ErrorResponse:
         result = False
 
     return result
+
+
+def check_virtenv():
+    """
+    Checks if current script is running in virtual env
+    """
+    return True if hasattr(sys, "real_prefix") else False
+
 
 def __build_tmp_file():
     """
@@ -166,6 +171,7 @@ def __build_tmp_file():
     tmpfile.seek(0, 0)
 
     return tmpfile
+
 
 def __random_filename():
     """ Generate randome file name"""
