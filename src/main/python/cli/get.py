@@ -41,17 +41,14 @@ def run(config):
     Gets a copy of the file from dropbox store. If specified gets
     """
     # Get client
-    authutils = reload(auth)
-    __log__.info("here {}".format(config))
     client, config = authutils.build_client(config)
 
     # Get the remote path for the given file
     # remote_path = pathutils.find_remote_db_path(config.get("local_file"))
     # __log__.info("remote " + remote_path)
 
-    # get_file = __do_output(remote_path, client, config)
-    # return get_file
-    return
+    get_file = __do_output(remote_path, client, config)
+    return get_file
 
 
 def __do_output(remote_path, client, config):

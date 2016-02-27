@@ -5,7 +5,7 @@ from __future__ import with_statement
 from dropbox.client import DropboxOAuth2FlowNoRedirect, DropboxClient
 from dropbox import rest as dbrest
 import logging
-import os
+import sys
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -78,9 +78,9 @@ def ask_for_auth_code_or_exit(auth_url, config):
     """
     log_auth_url(auth_url)
 
-    if config.get("input_disabled"):
+    if not config.get("input_disabled"):
         __log__.info("Input is disabled. Update config file with the auth code!")
-        os.exit(0)
+        sys.exit(0)
 
     else:
         auth_code = raw_input('Auth Code: ').strip()
