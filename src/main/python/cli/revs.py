@@ -45,6 +45,16 @@ def add_args(parser):
                "If not given, then outputs all revs"
     )
 
+    parser.add_argument(
+        "-R",
+        "--rev_list",
+        action = "store_true",
+        default = None,
+        help = "Outputs a list of all the rev hashes."
+    )
+
+    return
+
 
 def run(config):
     """
@@ -60,7 +70,7 @@ def run(config):
     # Now get the revisions of the given file
     revs = client.revisions(remote_path)
 
-    # Which version to use?
+    # Which revision to use?
     revVal = __get_rev(revs, config)
 
     # Get the formatter function
@@ -107,8 +117,13 @@ def __get_rev(revs, config):
                 revToUse = revs[pos]
                 __log__.debug("Pos set. New rev is {}".format(revToUse))
 
-        except:
-            pass
+        except Exception as err:
+            __log__.debug("Error getting specific rev. Returing all: {}".format(err.message))
+
+    elif config.get("rev_list"):
+        __log__.debug("Rev list set. Getting list of revs")
+        revToUse = _.pluck(revs, "revision")
+
     else:
         revToUse = revs
 
