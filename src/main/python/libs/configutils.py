@@ -4,6 +4,7 @@ from __future__ import with_statement
 
 import argparse
 import ConfigParser
+from libs import authutils
 import logging
 import os
 import sys
@@ -119,9 +120,19 @@ def setup_logger(config):
 ###
 # UTILS FOR VIM PLUGIN
 ###
+def vim_build_config_with_client(*sources):
+    """
+    Builds the config dict using `vim_build_config`, and then creates the auth client.
+    """
+    config = vim_build_config(sources)
+    client, config = authutils.build_client(config)
+
+    return config
+
+
 def vim_build_config(*sources):
     """
-    XXX This should only be used with VIM (say plugin)
+    XXX This should only be used with VIM (as a plugin)
 
     Builds the config object using VIM variables. The `sources` are
     merged in with the created config object.

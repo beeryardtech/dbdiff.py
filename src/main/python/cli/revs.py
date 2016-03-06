@@ -6,18 +6,14 @@ import logging
 import pprint
 import json
 import pydash as _
-import os
-from os.path import dirname, realpath # for library path manipulation
 import sys
 
-sys.path.insert(0, '{}/libs'.format(dirname(realpath(__file__))))
-from libs import auth, pathutils
+from libs import authutils, pathutils
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
-
-__log__  = logging.getLogger(__name__)
+__log__ = logging.getLogger(__name__)
 
 
 def add_args(parser):
@@ -46,7 +42,7 @@ def add_args(parser):
         "--rev_num",
         default = None,
         help = "Outputs only the rev at the given position. Can be negative numbers." +
-                "If not given, then outputs all revs"
+               "If not given, then outputs all revs"
     )
 
 
@@ -56,7 +52,7 @@ def run(config):
     different formats.
     """
     # Get client
-    client, config = auth.build_client(config)
+    client, config = authutils.build_client(config)
 
     # Get the remote path for the given file
     remote_path = pathutils.find_remote_db_path(config.get("local_file"))

@@ -8,7 +8,7 @@ import logging
 import os
 import sys
 
-from libs import auth
+from libs import authutils
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -34,7 +34,7 @@ def run(config):
         - Checks that there is revisions available
         - Deletes that file
     """
-    client, config = auth.build_client(config)
+    client, config = authutils.build_client(config)
 
     __log__.info("START checking connection!")
 
