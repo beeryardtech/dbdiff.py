@@ -53,12 +53,19 @@ def run(config):
     client, config = authutils.build_client(config)
 
     # Get the remote path for the given file
+    # TODO Might need a check if `local_file` is a dir
     remote_path = pathutils.find_remote_db_path(config.get("local_file"))
 
     try:
         get_file = __do_output(remote_path, client, config)
     except dbrest.ErrorResponse as err:
-        __log__.error("Failed to output file! Message: {}".format(err.message))
+        msg = {
+            "local_file": config.get("local_file"),
+            "remote_path": remote_path,
+            "body": err.body,
+            "message": err.message,
+        }
+        __log__.exception("Failed to output file! Error: {}".format(msg))
 
     return get_file
 

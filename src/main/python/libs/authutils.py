@@ -13,7 +13,7 @@ __copyright__ = "(c) Beeryard Tech 2016"
 __log__ = logging.getLogger(__name__)
 
 
-def build_client(config, auth_token = None, force_new = True):
+def build_client(config, auth_token = None, force_new = False):
     """
     Builds the Dropbox Client. Also update the config object.
 
@@ -21,10 +21,11 @@ def build_client(config, auth_token = None, force_new = True):
     create a new instance.
     """
     if config.get("client") and not force_new:
+        __log__.debug("Reusing client!")
         return (config.get("client"), config)
 
     if auth_token:
-        pass
+        __log__.debug("Auth Token available!")
 
     elif not auth_token and config.get("auth_token"):
         __log__.debug("Using auth_token from config")
