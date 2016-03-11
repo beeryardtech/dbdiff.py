@@ -5,7 +5,6 @@ from __future__ import with_statement
 from dropbox.client import DropboxOAuth2FlowNoRedirect, DropboxClient
 from dropbox import rest as dbrest
 import logging
-import os
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -14,12 +13,19 @@ __copyright__ = "(c) Beeryard Tech 2016"
 __log__ = logging.getLogger(__name__)
 
 
-def build_client(config, auth_token = None):
+def build_client(config, auth_token = None, force_new = False):
     """
     Builds the Dropbox Client. Also update the config object.
+
+    If the client is already available just return that copy. Use `force_new` to
+    create a new instance.
     """
+    if config.get("client") and not force_new:
+        __log__.debug("Reusing client!")
+        return (config.get("client"), config)
+
     if auth_token:
-        pass
+        __log__.debug("Auth Token available!")
 
     elif not auth_token and config.get("auth_token"):
         __log__.debug("Using auth_token from config")
@@ -78,9 +84,9 @@ def ask_for_auth_code_or_exit(auth_url, config):
     """
     log_auth_url(auth_url)
 
-    if config.get("input_disabled"):
+    if not config.get("input_disabled"):
         __log__.info("Input is disabled. Update config file with the auth code!")
-        os.exit(0)
+        raise AuthInputDisabled('Input Disabled')
 
     else:
         auth_code = raw_input('Auth Code: ').strip()
@@ -125,6 +131,14 @@ def try_finish_auth_flow(auth_flow, auth_code, auth_url, config):
     })
 
     return (auth_token, configClone)
+
+
+class AuthInputDisabled(Exception):
+    """
+    Expection for when inputs (such as raw_input) is unavailable. The caller should handle this.
+    Acts similar to a call to `sys.exit()`.
+    """
+    pass
 
 
 if __name__ == '__main__':

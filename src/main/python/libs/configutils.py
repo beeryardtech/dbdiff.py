@@ -106,7 +106,8 @@ def setup_logger(config):
         logging.basicConfig(level = logging.INFO)
 
     # Debug mode? (turn this on first, in case we want to debug below)
-    if config.get("verbose"):
+    if config.get("verbose") or config.get("debug"):
+        print("")
         logging.getLogger().setLevel(logging.DEBUG)
 
     # Handle warnings from urllib3
@@ -114,67 +115,6 @@ def setup_logger(config):
     logging.captureWarnings(True)
 
     return
-
-
-###
-# UTILS FOR VIM PLUGIN
-###
-def vim_build_config(*sources):
-    """
-    XXX This should only be used with VIM (say plugin)
-
-    Builds the config object using VIM variables. The `sources` are
-    merged in with the created config object.
-    """
-    varsToKeys = {
-        "app_code": "g:dbdiff_config_auth_app_code",
-        "app_key": "g:dbdiff_config_auth_app_key",
-        "app_secret": "g:dbdiff_config_auth_app_secret",
-        "app_token": "g:dbdiff_config_auth_app_token",
-        "debug": "g:dbdiff_config_system_debug",
-        "input_disabled": "g:dbdiff_config_system_input_disabled",
-        "quit": "g:dbdiff_config_system_quit",
-        "verbose": "g:dbdiff_config_system_verbose",
-    }
-
-    # Build the config object
-    config = vim_eval_var_keys(varsToKeys)
-
-    # Now merge in any additional `sources` to `config`
-    for source in sources:
-        if isinstance(source, dict):
-            config.update(source)
-        else:
-            __log__.error("Source is not a dict! Type: {} Value: {}".format(type(source), source))
-
-    return config
-
-
-def vim_eval_var_keys(varsToKeys):
-    """
-    Evals each value and returns a dict with the given keys.
-    """
-    import vim
-
-    result = {}
-    for keyVal, varVal in varsToKeys.items():
-        try:
-            varValToUse = vim.eval(varVal)
-        except vim.error as err:
-            # Could not eval value. So just use it in its raw form
-            varValToUse = varVal
-            __log__.debug(
-                "Issue with eval'ing key. Key: {}, Val: {} Message: {}".format(
-                    keyVal,
-                    varVal,
-                    err.message
-                )
-            )
-
-        # Now set value onto the dict
-        result[keyVal] = varValToUse
-
-    return result
 
 
 if __name__ == '__main__':

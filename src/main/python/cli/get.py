@@ -2,9 +2,10 @@
 # vim: tabstop=4:shiftwidth=4:expandtab:
 from __future__ import with_statement
 
+from dropbox import rest as dbrest
 import logging
 import sys
-from libs import auth, pathutils
+from libs import authutils, pathutils
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -28,9 +29,17 @@ def add_args(parser):
     )
 
     parser.add_argument(
+        "-i"
+        "--index",
+        default = None,
+        help = "Which revision position to use. 0 is the newest revision"
+    )
+
+    parser.add_argument(
         "-r"
         "--rev",
-        help = "Which given revision position to use. 0 is the newest revision"
+        default = None,
+        help = "The hash of a given revision for the file."
     )
 
     # TODO Create a arg for getting by date
@@ -41,17 +50,24 @@ def run(config):
     Gets a copy of the file from dropbox store. If specified gets
     """
     # Get client
-    authutils = reload(auth)
-    __log__.info("here {}".format(config))
     client, config = authutils.build_client(config)
 
     # Get the remote path for the given file
-    # remote_path = pathutils.find_remote_db_path(config.get("local_file"))
-    # __log__.info("remote " + remote_path)
+    # TODO Might need a check if `local_file` is a dir
+    remote_path = pathutils.find_remote_db_path(config.get("local_file"))
 
-    # get_file = __do_output(remote_path, client, config)
-    # return get_file
-    return
+    try:
+        get_file = __do_output(remote_path, client, config)
+    except dbrest.ErrorResponse as err:
+        msg = {
+            "local_file": config.get("local_file"),
+            "remote_path": remote_path,
+            "body": err.body,
+            "message": err.message,
+        }
+        __log__.exception("Failed to output file! Error: {}".format(msg))
+
+    return get_file
 
 
 def __do_output(remote_path, client, config):
@@ -62,7 +78,9 @@ def __do_output(remote_path, client, config):
 
     __log__.debug("Outputting remote file '{}' to '{}'".format(remote_path, dest))
 
-    with client.get_file(remote_path) as get_file:
+    # XXX Note that no control over bitsize done here. If needed can
+    # implement a while loop to load file in blocks
+    with client.get_file(remote_path, rev = config.get("rev")) as get_file:
         if dest == "STDOUT":
             sys.stdout.write(get_file.read())
         else:

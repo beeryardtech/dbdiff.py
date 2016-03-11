@@ -6,18 +6,14 @@ import logging
 import pprint
 import json
 import pydash as _
-import os
-from os.path import dirname, realpath # for library path manipulation
 import sys
 
-sys.path.insert(0, '{}/libs'.format(dirname(realpath(__file__))))
-from libs import auth, pathutils
+from libs import authutils, pathutils
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
-
-__log__  = logging.getLogger(__name__)
+__log__ = logging.getLogger(__name__)
 
 
 def add_args(parser):
@@ -28,15 +24,15 @@ def add_args(parser):
     )
 
     parser.add_argument(
-        "-d",
-        "--dest",
+        "-o",
+        "--output",
         default = "print",
-        help = "Output destination. Defaults to print."
+        help = "Output method. Defaults to print."
     )
 
     parser.add_argument(
         "-f",
-        "--format",
+        "--formatter",
         default = "json",
         help = "Which formatter function to use"
     )
@@ -46,8 +42,18 @@ def add_args(parser):
         "--rev_num",
         default = None,
         help = "Outputs only the rev at the given position. Can be negative numbers." +
-                "If not given, then outputs all revs"
+               "If not given, then outputs all revs"
     )
+
+    parser.add_argument(
+        "-R",
+        "--rev_list",
+        action = "store_true",
+        default = None,
+        help = "Outputs a list of all the rev hashes."
+    )
+
+    return
 
 
 def run(config):
@@ -56,7 +62,7 @@ def run(config):
     different formats.
     """
     # Get client
-    client, config = auth.build_client(config)
+    client, config = authutils.build_client(config)
 
     # Get the remote path for the given file
     remote_path = pathutils.find_remote_db_path(config.get("local_file"))
@@ -64,15 +70,16 @@ def run(config):
     # Now get the revisions of the given file
     revs = client.revisions(remote_path)
 
-    # Which version to use?
+    # Which revision to use?
     revVal = __get_rev(revs, config)
 
     # Get the formatter function
-    formatter = __get_formatter(config.get("format"))
+    formatter = __get_formatter(config.get("formatter"))
 
     # TODO Needs a way to control where to send output
     output = formatter(revVal)
-    __do_output(output, config)
+    if config.get("output"):
+        __do_output(output, config)
 
     return output
 
@@ -82,21 +89,25 @@ def __get_formatter(name):
     Selects which formatter function to use based on the string `name`. Pulls
     from a list (map). If `format_name` is not in map, logs a warning and defaults to json
     """
-    name = name.lower() if name else "json"
-    return FORMATTER_MAP.get(name, FORMATTER_MAP["json"])
+    if name:
+        formatter = FORMATTER_MAP.get(name.lower(), FORMATTER_MAP["idenity"])
+    else:
+        __log__.warning("Invalid name for formatter! Name: {}".format(name))
+        formatter = FORMATTER_MAP.get("json")
+
+    return formatter
 
 
-def __do_output(output, config):
+def __do_output(outputVal, config):
     """
-    Sends `output` to a given change based on `config["revs_dest"]` option.
+    Sends `outputVal` to a given change based on `config["output"]` option.
     Default to `print`.
     """
-    dest_str = config.get("revs_dest", "print").lower()
-    dest_func = REVS_DEST_MAP.get(dest_str)
+    outputStr = config.get("output", "print").lower()
+    outputFunc = REVS_OUTPUT_MAP.get(outputStr)
 
     # Now do output
-    dest_func(output)
-    return
+    return outputFunc(outputVal)
 
 
 def __get_rev(revs, config):
@@ -111,8 +122,13 @@ def __get_rev(revs, config):
                 revToUse = revs[pos]
                 __log__.debug("Pos set. New rev is {}".format(revToUse))
 
-        except:
-            pass
+        except Exception as err:
+            __log__.debug("Error getting specific rev. Returing all: {}".format(err.message))
+
+    elif config.get("rev_list"):
+        __log__.debug("Rev list set. Getting list of revs")
+        revToUse = _.pluck(revs, "revision")
+
     else:
         revToUse = revs
 
@@ -121,10 +137,11 @@ def __get_rev(revs, config):
 
 # Maps string to a formatter function. Typically use partial funcs to config the formatters
 FORMATTER_MAP = {
-    "json": _.partial(json.dumps, indent = 2, sort_keys = True)
+    "json": _.partial(json.dumps, indent = 2, sort_keys = True),
+    "idenity": _.identity,
 }
 
-REVS_DEST_MAP = {
+REVS_OUTPUT_MAP = {
     "print": print,
     "pprint": pprint.pprint
 }
