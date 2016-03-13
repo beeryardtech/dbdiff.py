@@ -1,4 +1,4 @@
-## dropbox-version-diff
+## dbdiff.py
 Scripts to get revision history for a given file and to diff that file.
 
 ## Setup
