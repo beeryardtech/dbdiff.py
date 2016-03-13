@@ -23,6 +23,24 @@ pip install -r requirements.txt
 pyb
 ```
 
+### Setting up Dropbox
+Login to htts://developer.dropbox.com and create a new "Dropbox API" app. Choose "Full Dropbox" access type and give it a name. Name has to be unique, so something like "{username}dbdiff". 
+
+Now go to the newly created app's settings page, make a copy of `dbdiff.example.ini` and name it `dbdiff.ini`, and update its auth section. 
+
+- app_key --> App Key
+- app_secret --> App Secret
+- app_token --> Generate an access token or leave blank and execute any of the commands
+
+### Commands
+
+The following are (or will be supported):
+
+- check - Verify API by running through a list of API calls and tests them.
+- get - Get a file at a specific revision
+- put - Put a given file in Dropbox. By default, this is a forced update.
+- revs - Get revision list of a given file
+
 ### Initial Project Setup
 ```sh
 # Install and run virtualenv,
