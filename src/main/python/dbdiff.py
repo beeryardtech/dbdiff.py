@@ -35,7 +35,7 @@ def main(args):
     for sc in cli.subcommands:
         subparser = subparsers.add_parser(
             sc,
-            help = "subcommand for {} operations.".format(sc)
+            help = "Executes {} on the Dropbox API.".format(sc)
         )
         cli.subcommands[sc].add_args(subparser)
 

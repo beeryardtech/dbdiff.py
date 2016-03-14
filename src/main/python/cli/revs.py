@@ -5,7 +5,7 @@ from __future__ import print_function, with_statement
 import logging
 import pprint
 import json
-import pydash as _
+from pydash import py_ as _
 import sys
 
 from libs import authutils, pathutils
@@ -27,14 +27,18 @@ def add_args(parser):
         "-o",
         "--output",
         default = "print",
-        help = "Output method. Defaults to print."
+        help = "Output method. Defaults to print. \n Possible values: {}".format(
+            ", ".join(_.map(OUTPUT_MAP.keys(), lambda val: "'{}'".format(val)))
+        )
     )
 
     parser.add_argument(
         "-f",
         "--formatter",
         default = "json",
-        help = "Which formatter function to use"
+        help = "Which formatter function to use. Possible values: {}".format(
+            ", ".join(_.map(FORMATTER_MAP.keys(), lambda val: "'{}'".format(val)))
+        )
     )
 
     parser.add_argument(
@@ -104,7 +108,7 @@ def __do_output(outputVal, config):
     Default to `print`.
     """
     outputStr = config.get("output", "print").lower()
-    outputFunc = REVS_OUTPUT_MAP.get(outputStr)
+    outputFunc = OUTPUT_MAP.get(outputStr)
 
     # Now do output
     return outputFunc(outputVal)
@@ -127,7 +131,7 @@ def __get_rev(revs, config):
 
     elif config.get("rev_list"):
         __log__.debug("Rev list set. Getting list of revs")
-        revToUse = _.pluck(revs, "revision")
+        revToUse = _.pluck(revs, "rev")
 
     else:
         revToUse = revs
@@ -135,13 +139,22 @@ def __get_rev(revs, config):
     return revToUse
 
 
+def hashes_json(output):
+    """
+    Formatter function to pluck out the revision hashes from the output, then formats it as json
+    """
+    return _(output).pluck("rev").thru(
+        lambda val: json.dumps(val, indent = 2, sort_keys = True)
+    ).value()
+
 # Maps string to a formatter function. Typically use partial funcs to config the formatters
 FORMATTER_MAP = {
     "json": _.partial(json.dumps, indent = 2, sort_keys = True),
+    "hashes": hashes_json,
     "idenity": _.identity,
 }
 
-REVS_OUTPUT_MAP = {
+OUTPUT_MAP = {
     "print": print,
     "pprint": pprint.pprint
 }
