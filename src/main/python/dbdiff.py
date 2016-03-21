@@ -12,11 +12,11 @@ import cli
 
 sys.path.insert(0, '{}/libs'.format(current_dir))
 from libs import configutils
+from libs.statemachine import StateMachine
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
-
 __log__ = logging.getLogger(__name__)
 
 
@@ -45,6 +45,9 @@ def main(args):
     config = configutils.merge_configs(opts.config, opts)
 
     configutils.setup_logger(config)
+
+    # Create the state machine
+    config["state_machine"] = StateMachine()
 
     # Now, let's see which subcommand was given and pass everything along to it
     if opts.subcommand:

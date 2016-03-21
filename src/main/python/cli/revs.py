@@ -2,13 +2,13 @@
 # vim: tabstop=4:shiftwidth=4:expandtab:
 from __future__ import print_function, with_statement
 
-import logging
-import pprint
 import json
+from libs import authutils, pathutils, vimutils
+import pprint
+import logging
 from pydash import py_ as _
 import sys
 
-from libs import authutils, pathutils
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
@@ -85,6 +85,9 @@ def run(config):
     if config.get("output"):
         __do_output(output, config)
 
+    if config.get("state_machine"):
+        config.get("state_machine").setup(revVal, output)
+
     return output
 
 
@@ -147,11 +150,13 @@ def hashes_json(output):
         lambda val: json.dumps(val, indent = 2, sort_keys = True)
     ).value()
 
+
 # Maps string to a formatter function. Typically use partial funcs to config the formatters
 FORMATTER_MAP = {
     "json": _.partial(json.dumps, indent = 2, sort_keys = True),
     "hashes": hashes_json,
     "idenity": _.identity,
+    "menu": vimutils.build_rev_menu,
 }
 
 OUTPUT_MAP = {

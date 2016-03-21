@@ -2,14 +2,20 @@
 # vim: tabstop=4:shiftwidth=4:expandtab:
 from __future__ import with_statement
 
-import logging
+from datetime import datetime
 from libs import authutils
-import vim
+import logging
+from pydash import py_ as _
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
 __log__ = logging.getLogger(__name__)
+
+try:
+    import vim
+except ImportError as err:
+    __log__.debug("Failed to import vim module, skipping")
 
 
 ###
@@ -86,26 +92,66 @@ def eval_or_convert(varVal):
     return TYPE_CONVERT_MAP.get(val, val)
 
 
-def scratch_buffer():
-    """
-    Create a scratch buffer (in a new tab)
-    """
-    vim.command("tabe | setlocal buftype=nofile bufhidden=hide noswapfile")
-    scratchBuffer = vim.current.buffer
-    return scratchBuffer
-
-
-def put_to_scratch_buffer(output):
+def put_to_scratch_buffer(output, buffer_type):
     """
     Create a new scratch buffer and output the `output` string to it.
     """
-    scratch = scratch_buffer()
+    scratch = scratch_buffer(buffer_type)
 
     for line in output.split("\n"):
         scratch.append(line)
 
     return scratch
 
+
+def scratch_buffer(buffer_type):
+    """
+    Create a scratch buffer in either a horizontal split ("split"), a vertical split ("vsplit"), or
+    a new tab ("tab").
+    """
+    buffer_type_cmd = BUFFER_TYPE_MAP.get(buffer_type)
+    if buffer_type_cmd is None:
+        __log__.debug("Buffer type cmd not defined!, buffer type: {}", buffer_type)
+
+    vim.command("{} | setlocal buftype=nofile bufhidden=hide noswapfile".format(buffer_type_cmd))
+    scratchBuffer = vim.current.buffer
+    return scratchBuffer
+
+
+def build_rev_menu(rev_list):
+    """
+    Create the VIM menu from the list of revisions. The result will be an
+    array of strings, with each element representing each row in the menu.
+    """
+    def menu_mapper(revVal, revKey):
+        index = len(rev_list) - revKey
+        modifiedTime = datetime.strptime(
+            revVal.get("modified").replace(" +0000", ""),
+            "%a, %d %b %Y %H:%M:%S"
+        ).strftime("%b %d, %H:%M:%S")
+        return "{} - {} ({})".format(index, modifiedTime, revVal.get("rev"))
+
+    return "{}\n{}\n".format(
+        REV_MENU_HEADER,
+        _(rev_list).map(menu_mapper).join("\n").value()
+    )
+
+
+##
+# Properties
+##
+BUFFER_TYPE_MAP = {
+    "split": "new",
+    "tab": "tabe",
+    "vsplit": "topleft vnew",
+}
+
+# TODO Use a string formatter to add name of file
+REV_MENU_HEADER = """
+" DBDiff for VIM
+" j/k  - Move through the list of revisions
+" <CR> - Open diff for the given revision
+"""
 
 TYPE_CONVERT_MAP = {
     None: False,
@@ -118,6 +164,7 @@ VIM_VARS_TO_KEYS = {
     "app_key": "g:dbdiff_config_auth_app_key",
     "app_secret": "g:dbdiff_config_auth_app_secret",
     "auth_token": "g:dbdiff_config_auth_auth_token",
+    "buffer_type": "g:dbdiff_config_system_buffer_type",
     "debug": "g:dbdiff_config_system_debug",
     "input_disabled": "g:dbdiff_config_system_input_disabled",
     "quit": "g:dbdiff_config_system_quit",

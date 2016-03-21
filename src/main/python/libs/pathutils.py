@@ -2,22 +2,14 @@
 # vim: tabstop=4:shiftwidth=4:expandtab:
 from __future__ import with_statement
 
-import json
-import gettext
 import logging
+import json
 import os
-from os.path import dirname, realpath # for library path manipulation
-import sys
-
-# For translations
-
-
 
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
-
-__log__  = logging.getLogger(__name__)
+__log__ = logging.getLogger(__name__)
 
 
 def find_remote_db_path(filepath, db_basepath = None):
@@ -37,16 +29,21 @@ def is_local_db_path(filepath, db_basepath = None):
 
 
 def normpath(filepath):
-    """Normalize `filepath`. That is call os.path.norm path, and expand user/vars"""
+    """
+    Normalize `filepath`. It will call os.path.norm path,
+    and expand user/vars
+    """
     return os.path.normpath(
         os.path.expandvars(
             os.path.expanduser(filepath)
         )
     )
 
+
 def abspath(filepath):
     """ Get the normalized path of `filepath`"""
     return normpath(os.path.abspath(filepath))
+
 
 def get_db_basepath():
     """

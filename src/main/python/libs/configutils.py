@@ -12,7 +12,6 @@ import urllib3
 __author__ = "Travis Goldie"
 __email__ = "tgoldie@gmail.com"
 __copyright__ = "(c) Beeryard Tech 2016"
-
 __log__ = logging.getLogger(__name__)
 
 
